@@ -1,24 +1,28 @@
 # Variables
-CC = g++                  # Compilador
-CFLAGS = -Wall -pthread   # Opciones de compilación
-SRC = src/prueba.cpp      # Archivo fuente
-OBJ = $(SRC:.cpp=.o)      # Archivos objeto
+CC = g++                 # Compilador
+CFLAGS = -Wall -pthread -Iinclude  # Opciones de compilación, incluye directorio de encabezados
+SRC_DIR = src            # Directorio de archivos fuente
+BUILD_DIR = build         # Carpeta para los archivos objeto
 EXEC = simulador          # Nombre del ejecutable
-BUILD_DIR = build         # Carpeta para guardar el ejecutable
 
-# Reglas
-all: $(BUILD_DIR)/$(EXEC)
+# Archivos fuente y objeto
+SRC = $(wildcard $(SRC_DIR)/*.cpp)  # Encuentra automáticamente todos los .cpp en src/
+OBJ = $(patsubst $(SRC_DIR)/%.cpp, $(BUILD_DIR)/%.o, $(SRC))
 
-# Crear el ejecutable en la carpeta BUILD_DIR
-$(BUILD_DIR)/$(EXEC): $(OBJ)
-	mkdir -p $(BUILD_DIR)             # Crear carpeta si no existe
+# Regla principal
+all: $(BUILD_DIR) $(EXEC)
+# Crear el ejecutable
+$(EXEC): $(OBJ)
 	$(CC) $(CFLAGS) $(OBJ) -o $@
 
-# Compilar archivos .cpp a .o
-%.o: %.cpp
+# Compilar cada archivo fuente a objeto
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# Limpiar archivos generados
+# Crear la carpeta build si no existe
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
+
+# Limpieza de archivos generados
 clean:
-	rm -f $(OBJ)
-	rm -rf $(BUILD_DIR)
+	rm -rf $(BUILD_DIR) $(EXEC) logs/*.log

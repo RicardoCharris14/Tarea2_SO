@@ -1,5 +1,6 @@
 #include "../include/consumer_producter.h"
 #include <iostream>
+#include <chrono>
 
 void producer(monitor &monitor, int ID){
     for(int i = 0;i < 5; i++){
@@ -14,13 +15,10 @@ void consumer(monitor &monitor, int ID, int time){
            item = monitor.consume();
            std::cout << "Consumidor " << ID << " consumió: " << item << "\n";
 
+        }catch(const std::runtime_error &e){
+            std::this_thread::sleep_for(std::chrono::seconds(time));
+            break;
         }
-        catch(const std::exception& e)
-        {
-            std::cerr << e.what() << '\n';
-        }
-        
-        std::cout << "Consumidor " << ID << " consumió: " << item << "\n";
     }
     
 }
