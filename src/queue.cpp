@@ -36,7 +36,7 @@ void circular_queue::enqueue(int item){
     indexFront = (indexFront + 1) % size_queue;
     // misma idea para reidexar y manatener el inidice dentro de los limites de la cola
     size_items--;
-    if(size_items > 0 && size_items == size_queue/4){
+    if(size_items > 0 && size_items == int(size_queue/4)){
         resize_queue(size_queue / 2);
         // reducimos el tamaño de la cola para ahorrar espacio
         // agregamos dinamismo a la cola
