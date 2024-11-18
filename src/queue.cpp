@@ -18,6 +18,7 @@ void circular_queue::resize_queue(int new_size){
     size_queue = new_size;
 }
 void circular_queue::enqueue(int item){
+    std::lock_guard<std::mutex> lock(mtx);
     if(isFull()){
         resize_queue(size_queue * 2);
         // duplicamos el tamaño de la cola si esta ya está llena
@@ -29,6 +30,7 @@ void circular_queue::enqueue(int item){
     size_items++;
 }
  int circular_queue::dequeue(){
+    std::lock_guard<std::mutex> lock(mtx);
     if(isEmpty()){
         throw std::runtime_error("La cola esta vacía \n Ingresa elementos para realizar la operacion: ");
     }
