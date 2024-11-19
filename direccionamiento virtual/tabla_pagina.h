@@ -3,11 +3,13 @@
 
 #include "pagina_virtual.h"
 #include <string>
+#include <queue> // LIFO 
 #include <vector>
 
 class TablaPagina{
 private:
     std::vector<PVirtual*>* tabla_paginas;
+    std::queue<PVirtual*> fifoQueue;
     int tamano;
     int capacidad;
     int* keys;
