@@ -31,7 +31,10 @@ PVirtual* TablaPagina::insertarPagina(PVirtual* pVirtual){
     } else{
         (*tabla_paginas)[index] = pVirtual;
     }
-    tamano++;
+
+    fifoQueue.push(pVirtual);
+    tamano++;   
+    
     return nullptr;
 }
 PVirtual* TablaPagina::eliminarPagina(int idPagina){
@@ -113,7 +116,33 @@ PVirtual* TablaPagina::optimo(){
 }
 
 PVirtual* TablaPagina::fifo(){
+    if(this->fifoQueue.empty()) {
+        return nullptr;
+    }
+    // se almacena primera pagina que ingresó y luego se quita de la cola
+    PVirtual* pagReemplazada = fifoQueue.front();
+    fifoQueue.pop();
 
+    // obtener índice de la pagina almacenada
+    int index = funcion_hash(paginaReemplazada->obtenerPageNumber());
+    PVirtual* aux = (*tabla_paginas)[index];
+    Pvirtual* prev = nullptr;
+
+    // eliminación de la página
+    while (aux != nullptr) {
+        if (aux->obtenerPageNumber() == paginaReemplazada->obtenerPageNumber()) {
+            if (prev == nullptr) { // Es la primera en la lista
+                (*tabla_paginas)[index] = aux->next();
+            } else {
+                prev->setNext(aux->next());
+            }
+            break;
+        }
+        prev = aux;
+        aux = aux->next();
+    }
+
+    return paginaReemplazada; // Retornamos la página eliminada
 }
 
 PVirtual* TablaPagina::lru(){
