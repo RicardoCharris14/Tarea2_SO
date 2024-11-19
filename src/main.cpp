@@ -71,14 +71,17 @@ int main(int argc, char *argv[]){
         std::cin >> opcion;
         if(opcion == 1){
             // llamar a la funcion de la cola
+            StartSimulator(productores, consumidores, sizeQueue, time, numberElemets);
         }else if (opcion == 2){
             std::cout << "\n Ingrese el numero de elementos para los productores \n" << std::endl;
             std::cin >> numberElemets;
             if(!(numberElemets > 0)){
                 std::cout << "\n Porfavor ingrese un numero valido de elementos \n" << std::endl;
             }
+            StartSimulator(productores, consumidores, sizeQueue, time, numberElemets);
         }else if(opcion == -1){
             std::cout << " \n Finalizando Programa ...\n" << std::endl;
+            break;
         }else{
             std::cout<< BOLDRED << "\n ¡¡Ingrese Una opcion valida porfavor!! \n" << RESET << std::endl;
             opcion = 0;
