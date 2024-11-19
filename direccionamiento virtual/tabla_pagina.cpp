@@ -7,10 +7,20 @@ TablaPagina::TablaPagina(std::string algReemplazo, int capacidad){
     keys = (int*)malloc(sizeof(int)*capacidad);
     this->algReemplazo = algReemplazo;
 }
-void TablaPagina::insertarPagina(PVirtual* pVirtual){
+/**
+ * @brief La funcion inserta la pagina virtual entregada por parametro a la tabla de 
+ * pagina, en caso de que la tabla este a su capacidad maxima, reemplaza una pagina
+ * determinada por el algoritmo de reemplazo seleccionado.
+ * 
+ * @param pVirtual pagina virtual a insertar
+ * @return PVirtual* pagina que fue reemplazada o nullptr si no reemplaza ninguna pagina.
+ */
+PVirtual* TablaPagina::insertarPagina(PVirtual* pVirtual){
     if (tamano == capacidad){
-        return;
+        PVirtual* pagReemplazada = reemplazarPagina(pVirtual);
+        return pagReemplazada;
     }
+
     int index = funcion_hash(pVirtual->obtenerPageNumber());
     if ((*tabla_paginas)[index] != nullptr){
         PVirtual* aux = (*tabla_paginas)[index];
@@ -21,6 +31,8 @@ void TablaPagina::insertarPagina(PVirtual* pVirtual){
     } else{
         (*tabla_paginas)[index] = pVirtual;
     }
+    tamano++;
+    return nullptr;
 }
 PVirtual* TablaPagina::eliminarPagina(int idPagina){
     if (tamano == 0){
@@ -36,10 +48,12 @@ PVirtual* TablaPagina::eliminarPagina(int idPagina){
             }else{
                 (*tabla_paginas)[index] = nullptr;
             }
+            tamano--;
             return aux;
         }
         aux = aux->next();
     }
+    tamano--;
     return nullptr;
 }
 PVirtual* TablaPagina::obtenerPagina(int idPagina){

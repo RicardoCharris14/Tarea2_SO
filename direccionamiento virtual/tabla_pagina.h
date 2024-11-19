@@ -14,11 +14,12 @@ private:
     std::string algReemplazo;
 public:
     TablaPagina(std::string, int);
-    void insertarPagina(PVirtual*);
+    PVirtual* insertarPagina(PVirtual*);
     PVirtual* eliminarPagina(int);
     PVirtual* obtenerPagina(int);
-    PVirtual* reemplazarPagina(PVirtual*);
+    
 private:
+    PVirtual* reemplazarPagina(PVirtual*);
     int funcion_hash(int);
     PVirtual* optimo();
     PVirtual* fifo();
