@@ -1,12 +1,36 @@
 #include "../include/queue.h"
 #include <stdexcept>
-
+#include <iostream>
+#include <fstream>
+#include <chrono>
+#include <iomanip>
+#include <sstream>
+#include <ctime>
+#define RESET   "\033[0m"
+#define BOLDGREEN   "\033[1m\033[32m"      /* Bold Green */
+#define BOLDRED     "\033[1m\033[31m"      /* Bold Red */
 circular_queue::circular_queue(int size):
     datas(size), 
     indexFront(0), 
     indexRear(0), 
     size_queue(size), 
-    size_items(0) {}
+    size_items(0) {
+        auto now = std::chrono::system_clock::now();
+        auto in_time_t = std::chrono::system_clock::to_time_t(now);
+        std::stringstream ss;
+        ss << "logs/log_" << std::put_time(std::localtime(&in_time_t), "%Y%m%d_%H%M%S") << ".txt";
+        logFile.open(ss.str(), std::ios::out | std::ios::app);
+        if(!logFile.is_open()){
+            throw std:: runtime_error("No se abrio el archivo log.");
+        }
+        logFile << BOLDGREEN << "[LOG] cola iniciada con una capacidad de " << size_queue << std::endl;
+
+    }
+    circular_queue::~circular_queue() {
+    if (logFile.is_open()) {
+        logFile.close();
+    }
+}
 void circular_queue::resize_queue(int new_size){
     std::vector<int> new_data(new_size);
     for(int i = 0; i < size_items; i++){
@@ -15,6 +39,8 @@ void circular_queue::resize_queue(int new_size){
     datas = new_data;
     indexFront = 0;
     indexRear = size_items;
+    logFile << BOLDRED << "[LOG] La cola se redimensionó con nuevo tamaño de: " << new_size << RESET << std::endl;
+    logFile.flush();
     size_queue = new_size;
 }
 void circular_queue::enqueue(int item){
@@ -28,6 +54,8 @@ void circular_queue::enqueue(int item){
     // reindexamos el indice del final, de tal forma
     // que solo puede tomar valores en [0. size_queue - 1]
     size_items++;
+    logFile << "[LOG] Enqueue: Elemento añadido = " << item << ", tamaño actual = " << size_items << "\n";
+    logFile.flush();
 }
  int circular_queue::dequeue(){
     std::lock_guard<std::mutex> lock(mtx);
@@ -43,6 +71,8 @@ void circular_queue::enqueue(int item){
         // reducimos el tamaño de la cola para ahorrar espacio
         // agregamos dinamismo a la cola
     }
+    logFile << "[LOG] Dequeue: Elemento eliminado = " << item << ", tamaño actual = " << size_items << "\n";
+    logFile.flush();
     return item;
  }
 

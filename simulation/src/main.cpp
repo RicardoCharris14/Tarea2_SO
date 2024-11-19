@@ -24,7 +24,7 @@ void StartSimulator(int productores, int consumidores, int sizeQueue, int time, 
 
     std::vector<std::thread> consumer_thread; // creamos un arreglo de hebras para cada consumidor
     for (int i = 0; i < consumidores; i++){
-        consumer_thread.emplace_back(consumer, std::ref(shared_monitor), i);
+        consumer_thread.emplace_back(consumer, std::ref(shared_monitor), i, time);
     }
     for(auto &p: producter_thread){
         p.join();

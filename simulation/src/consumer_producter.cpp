@@ -2,7 +2,7 @@
 #include <iostream>
 #include <chrono>
 
-void producer(monitor &monitor, int ID){
+void producter(monitor &monitor, int ID){
     for(int i = 0;i < 5; i++){
         monitor.produce(i + ID *100);
         std::cout << "Productor " << ID << " produjo: " << (i + ID * 100) << "\n";
