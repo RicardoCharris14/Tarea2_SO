@@ -43,6 +43,11 @@ int main(int argc, char *argv[]){
     int sizeQueue;
     int time;
 
+    if(argc != 9){
+        std::cout << "argumentos incorrectos, uso correcto:" << std::endl;
+        std::cout << argv[0] << " -p <numero productores> -c <numero consumidores> -s <tamaño cola> -t <tiempo espera consumidores>" << std::endl;
+        exit(EXIT_FAILURE);
+    }
     while ((opt = getopt(argc, argv, "p:c:s:t:")) != -1){
         switch(opt){
             case 'p':
