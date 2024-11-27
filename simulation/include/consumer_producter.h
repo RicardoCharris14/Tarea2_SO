@@ -5,7 +5,7 @@
 #include <thread>
 
 
-void consumer(monitor &monitor, int ID, int time);
+void consumer(monitor &monitor, int ID);
 void producter(monitor &monitor, int ID);
 
 

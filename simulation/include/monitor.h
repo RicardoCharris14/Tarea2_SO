@@ -8,7 +8,7 @@
 class monitor{
     private:
         circular_queue queue;
-        std:: mutex mtx;
+        std::mutex mtx;
         std::condition_variable notEmpty;
         std::condition_variable notFull;
     public:

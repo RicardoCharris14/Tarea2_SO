@@ -11,7 +11,7 @@
 #include <cstdlib>
 #include <thread>
 #include <vector>
-void StartSimulator(int productores, int consumidores, int sizeQueue, int time, int numElemets){
+void StartSimulator(int productores, int consumidores, int sizeQueue, int time){
     monitor shared_monitor(sizeQueue); // instanciamos la clase monitor
     std::vector<std::thread> producter_thread; // creamos un arreglo de hebras para cada productor
     for(int i = 0; i < productores; i++){
@@ -24,7 +24,7 @@ void StartSimulator(int productores, int consumidores, int sizeQueue, int time, 
 
     std::vector<std::thread> consumer_thread; // creamos un arreglo de hebras para cada consumidor
     for (int i = 0; i < consumidores; i++){
-        consumer_thread.emplace_back(consumer, std::ref(shared_monitor), i, time);
+        consumer_thread.emplace_back(consumer, std::ref(shared_monitor), i);
     }
     for(auto &p: producter_thread){
         p.join();
@@ -70,20 +70,12 @@ int main(int argc, char *argv[]){
         }
     }
     int opcion = 0;
-    int numberElemets = 10;
     while(opcion == 0){
-        std::cout << BOLDGREEN << "Bienvenido \n Nuestro simulador ofrece dos opciones para el uso de los productores. Ingrese su opcion:  \n [1] Para que cada productor agregue el tamaño predeterminado de elementos que puede producir (10 elementos) \n [2] Para definir usted el numero de elementos \n Presione -1 si desea finalizar el programa \n" << std::endl;
+        std::cout << BOLDGREEN << "Bienvenido a nuestro simulador \nPresione 1 si desea continuar la ejecución\nPresione -1 si desea finalizar el programa \n" << std::endl;
         std::cin >> opcion;
         if(opcion == 1){
             // llamar a la funcion de la cola
-            StartSimulator(productores, consumidores, sizeQueue, time, numberElemets);
-        }else if (opcion == 2){
-            std::cout << "\n Ingrese el numero de elementos para los productores \n" << std::endl;
-            std::cin >> numberElemets;
-            if(!(numberElemets > 0)){
-                std::cout << "\n Porfavor ingrese un numero valido de elementos \n" << std::endl;
-            }
-            StartSimulator(productores, consumidores, sizeQueue, time, numberElemets);
+            StartSimulator(productores, consumidores, sizeQueue, time);
         }else if(opcion == -1){
             std::cout << " \n Finalizando Programa ...\n" << std::endl;
             break;

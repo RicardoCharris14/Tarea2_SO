@@ -13,6 +13,7 @@ void monitor::produce(int item){
     // para esto usamos unique_lock
     queue.enqueue(item);
     logFile << "Producido: " << item << "\n";
+    if(queue.getSize_items())
     notEmpty.notify_one();
     // .notify_one() notifica a una hebra/consumidor
     // que la cola ya no esta vacía
