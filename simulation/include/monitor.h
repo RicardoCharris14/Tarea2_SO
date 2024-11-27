@@ -10,8 +10,6 @@ class monitor{
     private:
         circular_queue queue;
         std::mutex mtx;
-        std::condition_variable notEmpty;
-        std::condition_variable notFull;
         bool tiempo_iniciado;
         std::chrono::time_point<std::chrono::high_resolution_clock> tInicial;
         int tObjetivo;
