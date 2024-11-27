@@ -4,14 +4,12 @@
 
 void producter(monitor &monitor, int ID){
     
-    monitor.produce(ID *100);
-    std::cout << "Productor " << ID << " produjo: " << (ID * 100) << "\n";
+    monitor.produce(ID *100, ID);
     
 }
 void consumer(monitor &monitor, int ID){
     
     int item;
-    item = monitor.consume();
-    std::cout << "Consumidor " << ID << " consumió: " << item << "\n";
+    item = monitor.consume(ID);
     
 }

@@ -26,9 +26,11 @@ void StartSimulator(int productores, int consumidores, int sizeQueue, int time){
     for (int i = 0; i < consumidores; i++){
         consumer_thread.emplace_back(consumer, std::ref(shared_monitor), i);
     }
+
     for(auto &p: producter_thread){
         p.join();
     }
+    
     for(auto &c: consumer_thread){
         c.join();
     }
