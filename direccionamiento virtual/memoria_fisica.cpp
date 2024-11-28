@@ -1,29 +1,29 @@
-#include <"memoria_fisica.h">
+#include "memoria_fisica.h"
 
-MemFisica::MemFisica(int size) {
-	this->size = size;
+MemFisica::MemFisica(int capacity) {
+	for (int i=1 ; i<=capacity ; i++){
+		Marco* marco = new Marco(capacity-i);
+		marcosPagina[i] = marco;
+	}
+	this->capacity = capacity;
 }
 
-void MemFisica::getSize() {
-	return this->size;
-}
-
-Marco MemFisica::obtenerMarcoDisp() {
+Marco* MemFisica::obtenerMarcoDisp() {
 	if(this->marcosPagina.empty()) {
 		return nullptr;
 	}
 	else {
-		Marco marcoDisponible = this->marcosPagina.back(); // ultimo elemento del vector
+		Marco* marcoDisponible = this->marcosPagina.back(); // ultimo elemento del vector
 		this->marcosPagina.pop_back(); // quitamos el ultimo marco
 		return marcoDisponible;
 	}
 }
 
 bool MemFisica::agregarMarco(Marco* m) {
-	if(this->marcosPagina.size() == this->size) {
+	if(this->marcosPagina.size() == this->capacity) {
 		return false; // no se puede agregar marco
 	}
-	else if(this->marcosPagina.size() < this->size) {
+	else {
 		this->marcosPagina.push_back(m);
 		return true;
 	}

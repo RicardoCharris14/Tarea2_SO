@@ -1,10 +1,12 @@
 #include "tabla_pagina.h"
 
-TablaPagina::TablaPagina(std::string algReemplazo, int capacidad) {
+
+TablaPagina::TablaPagina(MemFisica memoria, std::string algReemplazo, int capacidad) {
     if (algReemplazo != "fifo" && algReemplazo != "lru" && 
         algReemplazo != "lrureloj" && algReemplazo != "optimo") {
         throw std::invalid_argument("Algoritmo no válido. Use 'fifo', 'lru', 'lrureloj' o 'optimo'.");
     }
+    this->memoria = memoria;
     this->algReemplazo = algReemplazo;
     this->capacidad = capacidad;
     this->keys = new int(capacidad);
@@ -24,7 +26,7 @@ TablaPagina::TablaPagina(std::string algReemplazo, int capacidad) {
  * @param pVirtual pagina virtual a insertar
  * @return PVirtual* pagina que fue reemplazada o nullptr si no reemplaza ninguna pagina.
  */
-PVirtual* TablaPagina::insertarPagina(PVirtual* pVirtual, const std::vector<int>& referencias, int posicionActual) {
+PVirtual* TablaPagina::insertarPagina(PVirtual* pVirtual, const std::vector<int>& referencias = std::vector<int>(), int posicionActual = NULL) {
     int idPagina = pVirtual->obtenerPageNumber();
     PVirtual* paginaExistente = obtenerPagina(idPagina);
 
@@ -39,6 +41,10 @@ PVirtual* TablaPagina::insertarPagina(PVirtual* pVirtual, const std::vector<int>
         PVirtual* pagReemplazada = reemplazarPagina(pVirtual, referencias, posicionActual);
         return pagReemplazada;
     }
+
+    //Se asigna un marco fisico a la pagina virtual
+    Marco* marco = memoria.obtenerMarcoDisp();
+    pVirtual->asignarMarco(marco);
 
     //Revisa si hay un elemento en la posicion obtenida por el hash, si lo hay busca un espacio en la lista enlazada, si no,
     //inserta el nuevo.
@@ -55,6 +61,11 @@ PVirtual* TablaPagina::insertarPagina(PVirtual* pVirtual, const std::vector<int>
 
     //se añade a la cola fifo
     fifoQueue.push(pVirtual);
+
+    //se añade a estructuras lru
+    lruList.push_front(pVirtual);
+    lruMap.emplace(pVirtual->obtenerPageNumber(), lruList.begin());
+
     keys[tamano] = pVirtual->obtenerPageNumber();
     tamano++;
     return nullptr;
@@ -84,6 +95,11 @@ PVirtual* TablaPagina::eliminarPagina(int idPagina){
                     break;
                 }
             }
+            //Se devuelve a memoria el marco de la pagina eliminada
+            Marco* marco = aux->obtenerMarco();
+            aux->asignarMarco(nullptr);
+            memoria.agregarMarco(marco);
+            
             tamano--;
             return aux;
         }
@@ -185,28 +201,6 @@ PVirtual* TablaPagina::fifo() {
     PVirtual* paginaReemplazada = fifoQueue.front(); // la mas reciente
     fifoQueue.pop();
 
-    if (paginaReemplazada->obtenerMarco()) {
-        paginaReemplazada->obtenerMarco()->setRefBit(false);
-    }
-
-    // Eliminar la página de la tabla hash
-    int index = funcion_hash(paginaReemplazada->obtenerPageNumber());
-    PVirtual* aux = (*tabla_paginas)[index];
-    PVirtual* prev = nullptr;
-
-    while (aux != nullptr) {
-        if (aux->obtenerPageNumber() == paginaReemplazada->obtenerPageNumber()) {
-            if (prev == nullptr) {
-                (*tabla_paginas)[index] = aux->next();
-            } else {
-                prev->setNext(aux->next());
-            }
-            break;
-        }
-        prev = aux;
-        aux = aux->next();
-    }
-
     return paginaReemplazada;
 }
 
@@ -217,29 +211,6 @@ PVirtual* TablaPagina::lru() {
     PVirtual* paginaReemplazada = lruList.back();
     lruList.pop_back();
     lruMap.erase(paginaReemplazada->obtenerPageNumber());
-
-    // Liberar el marco de la página reemplazada
-    if (paginaReemplazada->obtenerMarco()) {
-        paginaReemplazada->obtenerMarco()->setRefBit(false);
-    }
-
-    // Eliminar la página de la tabla hash
-    int index = funcion_hash(paginaReemplazada->obtenerPageNumber());
-    PVirtual* aux = (*tabla_paginas)[index];
-    PVirtual* prev = nullptr;
-
-    while (aux != nullptr) {
-        if (aux->obtenerPageNumber() == paginaReemplazada->obtenerPageNumber()) {
-            if (prev == nullptr) {
-                (*tabla_paginas)[index] = aux->next();
-            } else {
-                prev->setNext(aux->next());
-            }
-            break;
-        }
-        prev = aux;
-        aux = aux->next();
-    }
 
     return paginaReemplazada;
 }
@@ -261,19 +232,17 @@ PVirtual* TablaPagina::lruReloj() {
         PVirtual* pagina = (*tabla_paginas)[indice_reloj];
 
         if (pagina != nullptr) {
-            Marco* marco = pagina->obtenerMarco();
-            if (marco) {
-                if (!marco->getRefBit()) { // Si el bit de referencia es 0
-                    PVirtual* paginaReemplazada = pagina;
-                    (*tabla_paginas)[indice_reloj] = nullptr; // Liberar la página
-                    indice_reloj = (indice_reloj + 1) % capacidad; // Avanzar el puntero
-                    return paginaReemplazada;
-                } else {
-                    // Si el bit es 1, lo reseteamos a 0
-                    marco->setRefBit(false);
-                }
+            if (pagina->getRefBit()) { // Si el bit de referencia es 0
+                PVirtual* paginaReemplazada = pagina;
+                (*tabla_paginas)[indice_reloj] = nullptr; // Liberar la página
+                indice_reloj = (indice_reloj + 1) % capacidad; // Avanzar el puntero
+                return paginaReemplazada;
+            } else {
+                // Si el bit es 1, lo reseteamos a 0
+                pagina->setRefBit(false);
             }
         }
+    
 
         indice_reloj = (indice_reloj + 1) % capacidad; // Avanzar circularmente
 

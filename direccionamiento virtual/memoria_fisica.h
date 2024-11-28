@@ -5,12 +5,11 @@
 
 class MemFisica {
 private:
-	int size;
+	int capacity;
 	std::vector<Marco*> marcosPagina;
 public:
 	MemFisica(int);
-	int getSize();
-	Marco obtenerMarcoDisp(); // idea: retornar marco disponible o null en caso contrario
+	Marco* obtenerMarcoDisp(); // idea: retornar marco disponible o null en caso contrario
 	bool agregarMarco(Marco*); // idea: ver cuantas entradas tiene el vector. Si es menor que size pushear.
 };
 

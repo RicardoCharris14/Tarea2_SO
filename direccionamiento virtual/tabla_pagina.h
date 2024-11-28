@@ -2,6 +2,7 @@
 #define TABLA_PAGINA_H
 
 #include "pagina_virtual.h"
+#include "memoria_fisica.h"
 #include <string>
 #include <vector>
 #include <queue>
@@ -11,6 +12,7 @@
 
 class TablaPagina {
 private:
+    MemFisica memoria;
     std::vector<PVirtual*>* tabla_paginas;
     std::queue<PVirtual*> fifoQueue;
     std::list<PVirtual*> lruList;
@@ -24,7 +26,7 @@ private:
     int funcion_hash(int); 
 
 public:
-    TablaPagina(std::string, int);
+    TablaPagina(MemFisica, std::string, int);
     PVirtual* insertarPagina(PVirtual*, const std::vector<int>&, int);
     PVirtual* eliminarPagina(int); // Eliminar duplicados
     PVirtual* obtenerPagina(int);  // Eliminar duplicados
