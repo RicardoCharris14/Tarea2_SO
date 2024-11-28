@@ -22,6 +22,7 @@ Ambos simuladores fueron desarrollados en Linux, por lo que se necesita este ent
  ./simulador -p <productores> -c <consumidores> -s <tamaño de la cola> -t <tiempo de espera>
   ```
 ### **Compilar y ejecutar Parte 2 (Simulador de memoria virtual)**
+Acceder a la carpeta 'direccionamiento virtual' y ejecutar los siguientes comandos en la terminal:
 ```
 g++ main.cpp tabla_pagina.cpp marco_pagina.cpp pagina_virtual.cpp -o main
 ```
