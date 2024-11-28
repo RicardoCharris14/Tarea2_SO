@@ -1,12 +1,12 @@
 #include "tabla_pagina.h"
+#include <iostream>
 
 
-TablaPagina::TablaPagina(MemFisica memoria, std::string algReemplazo, int capacidad) {
+TablaPagina::TablaPagina(MemFisica memoria, std::string algReemplazo, int capacidad) : memoria(memoria){
     if (algReemplazo != "fifo" && algReemplazo != "lru" && 
         algReemplazo != "lrureloj" && algReemplazo != "optimo") {
         throw std::invalid_argument("Algoritmo no válido. Use 'fifo', 'lru', 'lrureloj' o 'optimo'.");
     }
-    this->memoria = memoria;
     this->algReemplazo = algReemplazo;
     this->capacidad = capacidad;
     this->keys = new int(capacidad);
@@ -26,7 +26,7 @@ TablaPagina::TablaPagina(MemFisica memoria, std::string algReemplazo, int capaci
  * @param pVirtual pagina virtual a insertar
  * @return PVirtual* pagina que fue reemplazada o nullptr si no reemplaza ninguna pagina.
  */
-PVirtual* TablaPagina::insertarPagina(PVirtual* pVirtual, const std::vector<int>& referencias = std::vector<int>(), int posicionActual = NULL) {
+PVirtual* TablaPagina::insertarPagina(PVirtual* pVirtual, const std::vector<int>& referencias = std::vector<int>(), int posicionActual = -1) {
     int idPagina = pVirtual->obtenerPageNumber();
     PVirtual* paginaExistente = obtenerPagina(idPagina);
 
@@ -68,6 +68,7 @@ PVirtual* TablaPagina::insertarPagina(PVirtual* pVirtual, const std::vector<int>
 
     keys[tamano] = pVirtual->obtenerPageNumber();
     tamano++;
+    std::cout << "Entra pagina: " << pVirtual->obtenerPageNumber() << " | marco obtenido: " << pVirtual->obtenerMarco()->getId() << std::endl;
     return nullptr;
 }
 
@@ -101,6 +102,7 @@ PVirtual* TablaPagina::eliminarPagina(int idPagina){
             memoria.agregarMarco(marco);
             
             tamano--;
+            std::cout << "Sale pagina: " << idPagina << " | marco soltado: " << marco->getId() << std::endl;
             return aux;
         }
         aux = aux->next();

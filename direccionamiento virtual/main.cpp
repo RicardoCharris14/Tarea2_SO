@@ -5,6 +5,7 @@
 #include "tabla_pagina.h"
 #include "marco_pagina.h"
 #include "pagina_virtual.h"
+#include "memoria_fisica.h"
 // compilar usando g++ main.cpp tabla_pagina.cpp marco_pagina.cpp pagina_virtual.cpp -o main (Linux)
 // ejecutar usando ./main -m <n_marcos> -a <algoritmo> -f <file>
 // ejemplo que funciona: ./main -m 3 -a fifo -f ref.txt
@@ -64,8 +65,11 @@ int main(int argc, char const *argv[]){
         // Leer las referencias desde el archivo
         std::vector<int> referencias = leerReferenciasDesdeArchivo(archivoReferencias);
 
+        // Crear los marcos de pagina
+        MemFisica memoria(marcos);
+
         // Crear la tabla de páginas con el algoritmo especificado
-        TablaPagina tabla(algoritmo, marcos);
+        TablaPagina tabla(memoria, algoritmo, marcos);
 
         int fallosDePagina = 0;
 
@@ -78,8 +82,6 @@ int main(int argc, char const *argv[]){
                 ++fallosDePagina;
                 delete paginaReemplazada;
             }
-
-            std::cout << "Procesada referencia: " << referencias[i] << std::endl;
         }
 
         std::cout << "\nNúmero total de fallos de página: " << fallosDePagina << std::endl;
