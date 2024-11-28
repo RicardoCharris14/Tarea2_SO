@@ -4,12 +4,9 @@
 class Marco{
 private:
     int id;
-    bool bit_referencia;
 public:
     Marco(int);
     int getId();
-    bool getRefBit();
-    void setRefBit(bool);
 };
 
 #endif

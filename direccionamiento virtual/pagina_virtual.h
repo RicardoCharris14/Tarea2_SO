@@ -6,6 +6,7 @@
 class PVirtual{
 private:
     int pageNumber;
+    bool bitReferencia;
     Marco* marcoAsociado;
     PVirtual* nextP;
     PVirtual* prevP;
@@ -18,6 +19,8 @@ public:
     void setNext(PVirtual*);
     void setPrev(PVirtual*);
     int obtenerPageNumber();
+    bool getRefBit();
+    void setRefBit(bool);
 };
 
 #endif

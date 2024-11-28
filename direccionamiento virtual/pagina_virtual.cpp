@@ -39,3 +39,11 @@ Marco* PVirtual::obtenerMarco(){
 int PVirtual::obtenerPageNumber(){
     return pageNumber;
 }
+
+bool PVirtual::getRefBit(){
+    return this->bitReferencia;
+}
+
+void PVirtual::setRefBit(bool bit_referencia){
+    this->bitReferencia = bit_referencia;
+}
