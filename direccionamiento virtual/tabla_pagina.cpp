@@ -32,6 +32,7 @@ PVirtual* TablaPagina::insertarPagina(PVirtual* pVirtual, const std::vector<int>
 
     if (paginaExistente != nullptr) {
         // Página ya está cargada; actualizar LRU
+        paginaExistente->setRefBit(true);
         std::cout << "existe pagina: " << pVirtual->obtenerPageNumber() << "  |  marco: " << paginaExistente->obtenerMarco()->getId() << std::endl;
         actualizarLRU(paginaExistente);
         return nullptr; // No hay fallo de página
@@ -59,6 +60,8 @@ PVirtual* TablaPagina::insertarPagina(PVirtual* pVirtual, const std::vector<int>
     } else {
         (*tabla_paginas)[index] = pVirtual;
     }
+    //Se setea bit de referencia en 1
+    pVirtual->setRefBit(true);
 
     //se añade a la cola fifo
     fifoQueue.push(pVirtual);
@@ -70,15 +73,13 @@ PVirtual* TablaPagina::insertarPagina(PVirtual* pVirtual, const std::vector<int>
     keys[tamano] = pVirtual->obtenerPageNumber();
     tamano++;
     std::cout << "Entra pagina: " << pVirtual->obtenerPageNumber() << "   |   marco obtenido: " << pVirtual->obtenerMarco()->getId() << std::endl;
-    return nullptr;
+    return pVirtual;
 }
 
 PVirtual* TablaPagina::eliminarPagina(int idPagina){
-    std::cout << "queue out 5: " << idPagina << std::endl;
     if (tamano == 0){
         return nullptr;
     }
-    std::cout << "queue out 6: " << idPagina << std::endl;
     // busca la pagina en la posicion obtenida por la funcion hash y en la lista enlazada, si la encuentra la retira y la retorna.
     int index = funcion_hash(idPagina);
     PVirtual* aux = (*tabla_paginas)[index];
@@ -87,7 +88,7 @@ PVirtual* TablaPagina::eliminarPagina(int idPagina){
             if(aux->prev() != nullptr){
                 aux->prev()->setNext(aux->next());
             }else{
-                (*tabla_paginas)[index] = nullptr;
+                (*tabla_paginas)[index] = aux->next();
             }
             //Elimina la key de la pagina retirada de keys
             for (int i=0 ; i<tamano ; i++){
@@ -140,7 +141,6 @@ PVirtual* TablaPagina::reemplazarPagina(PVirtual* pVirtual, const std::vector<in
         pagina = fifo();
     } else if (algReemplazo == "lru") {
         pagina = lru();
-        std::cout << "queue out 3: " << pagina->obtenerPageNumber() << std::endl;
     } else if (algReemplazo == "lrureloj") {
         pagina = lruReloj();
     } else if (algReemplazo == "optimo") {
@@ -149,11 +149,9 @@ PVirtual* TablaPagina::reemplazarPagina(PVirtual* pVirtual, const std::vector<in
         throw std::runtime_error("Algoritmo no reconocido en reemplazarPagina.");
     }
 
-    std::cout << "queue out 4: " << pagina->obtenerPageNumber() << std::endl;
     // Eliminar la pagina anterior
     eliminarPagina(pagina->obtenerPageNumber());
     //insertar la nueva pagina
-    std::cout << "queue out : " << pagina->obtenerPageNumber() << std::endl;
     insertarPagina(pVirtual);
 
     return pagina;
@@ -204,9 +202,7 @@ PVirtual* TablaPagina::optimo(const std::vector<int>& referencias, int posicionA
 PVirtual* TablaPagina::fifo() {
 
     PVirtual* paginaReemplazada = fifoQueue.front(); // la mas reciente
-    std::cout << "queue out 1: " << paginaReemplazada->obtenerPageNumber() << std::endl;
     fifoQueue.pop();
-    std::cout << "queue out 2: " << paginaReemplazada->obtenerPageNumber() << std::endl;
     return paginaReemplazada;
 }
 
@@ -232,14 +228,14 @@ void TablaPagina::actualizarLRU(PVirtual* pVirtual) {
 
 PVirtual* TablaPagina::lruReloj() {
     int vueltas = 0; // Contador de vueltas completas
-
-    while (vueltas < 2) { // Limitar a dos vueltas completas
-        PVirtual* pagina = (*tabla_paginas)[indice_reloj];
-
+    int key;
+    PVirtual* pagina;
+    while (vueltas < 2*capacidad) { // Limitar a dos vueltas completas
+        key = keys[indice_reloj];
+        pagina = obtenerPagina(key);
         if (pagina != nullptr) {
-            if (pagina->getRefBit()) { // Si el bit de referencia es 0
+            if (!pagina->getRefBit()) { // Si el bit de referencia es 0
                 PVirtual* paginaReemplazada = pagina;
-                (*tabla_paginas)[indice_reloj] = nullptr; // Liberar la página
                 indice_reloj = (indice_reloj + 1) % capacidad; // Avanzar el puntero
                 return paginaReemplazada;
             } else {
@@ -250,10 +246,8 @@ PVirtual* TablaPagina::lruReloj() {
     
 
         indice_reloj = (indice_reloj + 1) % capacidad; // Avanzar circularmente
-
-        if (indice_reloj == 0) { // Si completa una vuelta
-            vueltas++;
-        }
+    
+        vueltas++;
     }
 
     // Si no se encuentra ninguna página reemplazable
