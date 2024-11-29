@@ -32,6 +32,7 @@ PVirtual* TablaPagina::insertarPagina(PVirtual* pVirtual, const std::vector<int>
 
     if (paginaExistente != nullptr) {
         // Página ya está cargada; actualizar LRU
+        std::cout << "existe pagina: " << pVirtual->obtenerPageNumber() << "  |  marco: " << paginaExistente->obtenerMarco()->getId() << std::endl;
         actualizarLRU(paginaExistente);
         return nullptr; // No hay fallo de página
     }  
@@ -73,10 +74,11 @@ PVirtual* TablaPagina::insertarPagina(PVirtual* pVirtual, const std::vector<int>
 }
 
 PVirtual* TablaPagina::eliminarPagina(int idPagina){
+    std::cout << "queue out 5: " << idPagina << std::endl;
     if (tamano == 0){
         return nullptr;
     }
-
+    std::cout << "queue out 6: " << idPagina << std::endl;
     // busca la pagina en la posicion obtenida por la funcion hash y en la lista enlazada, si la encuentra la retira y la retorna.
     int index = funcion_hash(idPagina);
     PVirtual* aux = (*tabla_paginas)[index];
@@ -138,6 +140,7 @@ PVirtual* TablaPagina::reemplazarPagina(PVirtual* pVirtual, const std::vector<in
         pagina = fifo();
     } else if (algReemplazo == "lru") {
         pagina = lru();
+        std::cout << "queue out 3: " << pagina->obtenerPageNumber() << std::endl;
     } else if (algReemplazo == "lrureloj") {
         pagina = lruReloj();
     } else if (algReemplazo == "optimo") {
@@ -146,10 +149,11 @@ PVirtual* TablaPagina::reemplazarPagina(PVirtual* pVirtual, const std::vector<in
         throw std::runtime_error("Algoritmo no reconocido en reemplazarPagina.");
     }
 
-
+    std::cout << "queue out 4: " << pagina->obtenerPageNumber() << std::endl;
     // Eliminar la pagina anterior
     eliminarPagina(pagina->obtenerPageNumber());
     //insertar la nueva pagina
+    std::cout << "queue out : " << pagina->obtenerPageNumber() << std::endl;
     insertarPagina(pVirtual);
 
     return pagina;
@@ -183,8 +187,7 @@ PVirtual* TablaPagina::optimo(const std::vector<int>& referencias, int posicionA
                 proximaOcurrencia = j;
                 break;
             }
-        }
-
+        } 
         if (proximaOcurrencia == -1) {  // si no se usará nunca más
             return pagina;
         }
@@ -201,11 +204,11 @@ PVirtual* TablaPagina::optimo(const std::vector<int>& referencias, int posicionA
 PVirtual* TablaPagina::fifo() {
 
     PVirtual* paginaReemplazada = fifoQueue.front(); // la mas reciente
+    std::cout << "queue out 1: " << paginaReemplazada->obtenerPageNumber() << std::endl;
     fifoQueue.pop();
-
+    std::cout << "queue out 2: " << paginaReemplazada->obtenerPageNumber() << std::endl;
     return paginaReemplazada;
 }
-
 
 PVirtual* TablaPagina::lru() {
 
