@@ -68,7 +68,7 @@ PVirtual* TablaPagina::insertarPagina(PVirtual* pVirtual, const std::vector<int>
 
     keys[tamano] = pVirtual->obtenerPageNumber();
     tamano++;
-    std::cout << "Entra pagina: " << pVirtual->obtenerPageNumber() << " | marco obtenido: " << pVirtual->obtenerMarco()->getId() << std::endl;
+    std::cout << "Entra pagina: " << pVirtual->obtenerPageNumber() << "   |   marco obtenido: " << pVirtual->obtenerMarco()->getId() << std::endl;
     return nullptr;
 }
 
@@ -102,7 +102,7 @@ PVirtual* TablaPagina::eliminarPagina(int idPagina){
             memoria.agregarMarco(marco);
             
             tamano--;
-            std::cout << "Sale pagina: " << idPagina << " | marco soltado: " << marco->getId() << std::endl;
+            std::cout << "Sale pagina: " << idPagina << "    |   marco soltado: " << marco->getId() << std::endl;
             return aux;
         }
         aux = aux->next();

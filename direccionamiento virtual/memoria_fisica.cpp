@@ -1,9 +1,10 @@
 #include "memoria_fisica.h"
 
 MemFisica::MemFisica(int capacity) {
+	marcosPagina = std::vector<Marco*>(capacity);
 	for (int i=1 ; i<=capacity ; i++){
-		Marco* marco = new Marco(capacity-i);
-		marcosPagina[i] = marco;
+		Marco* marco = new Marco(capacity-i+1);
+		marcosPagina[i-1] = marco;
 	}
 	this->capacity = capacity;
 }
