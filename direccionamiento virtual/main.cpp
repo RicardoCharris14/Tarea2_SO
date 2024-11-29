@@ -80,7 +80,6 @@ int main(int argc, char const *argv[]){
             PVirtual* paginaReemplazada = tabla.insertarPagina(pagina, referencias, i);
             if (paginaReemplazada != nullptr) {
                 ++fallosDePagina;
-                delete paginaReemplazada;
             }
         }
 
